@@ -12,10 +12,10 @@ st.set_page_config(
     page_title="SentinelOne PowerQuery Assistant",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded"  # Default to expanded
 )
 
-# Add security headers
+# Add security headers and responsive sidebar behavior
 st.markdown("""
     <style>
         /* Prevent clickjacking */
@@ -29,7 +29,63 @@ st.markdown("""
             -ms-user-select: none;
             user-select: none;
         }
+        
+        /* Add responsive sidebar behavior */
+        @media (max-width: 768px) {
+            .css-1d391kg {
+                display: none !important;
+            }
+        }
     </style>
+    
+    <script>
+        // Function to check if device is mobile
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+        
+        // Function to collapse sidebar
+        function collapseSidebar() {
+            const sidebar = document.querySelector('.css-1d391kg');
+            if (sidebar) {
+                sidebar.style.display = 'none';
+                // Also try to collapse the sidebar using Streamlit's internal method
+                if (window.parent && window.parent.streamlitRPC) {
+                    window.parent.streamlitRPC.setComponentValue('sidebar', false);
+                }
+            }
+        }
+        
+        // Function to expand sidebar
+        function expandSidebar() {
+            const sidebar = document.querySelector('.css-1d391kg');
+            if (sidebar) {
+                sidebar.style.display = 'block';
+                // Also try to expand the sidebar using Streamlit's internal method
+                if (window.parent && window.parent.streamlitRPC) {
+                    window.parent.streamlitRPC.setComponentValue('sidebar', true);
+                }
+            }
+        }
+        
+        // Set sidebar state based on device on page load
+        window.addEventListener('load', function() {
+            if (isMobile()) {
+                collapseSidebar();
+            } else {
+                expandSidebar();
+            }
+        });
+        
+        // Update on window resize
+        window.addEventListener('resize', function() {
+            if (isMobile()) {
+                collapseSidebar();
+            } else {
+                expandSidebar();
+            }
+        });
+    </script>
 """, unsafe_allow_html=True)
 
 # Load environment variables
